@@ -1,0 +1,71 @@
+# One command starts everything: docker compose up
+# All ports bind to 127.0.0.1 so nothing is reachable from other machines.
+# Each service receives only the environment variables it needs (values come from .env).
+
+services:
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:2026.11.2
+    container_name: homeassistant
+    volumes:
+      - ./ha-config:/config
+    environment:
+      - TZ=Asia/Karachi
+    ports:
+      - "127.0.0.1:8123:8123"
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0.22
+    container_name: mosquitto
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+    ports:
+      - "127.0.0.1:1883:1883"
+    restart: unless-stopped
+
+  simulator:
+    build: ./simulator
+    container_name: simulator
+    environment:
+      - MQTT_HOST=${MQTT_HOST:-mosquitto}
+      - MQTT_PORT=${MQTT_PORT:-1883}
+      - MQTT_USERNAME=${MQTT_USERNAME:-}
+      - MQTT_PASSWORD=${MQTT_PASSWORD:-}
+    volumes:
+      - ./simulator:/app
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: backend
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+      - FRONTEND_ORIGIN=${FRONTEND_ORIGIN:-http://localhost:5173}
+    volumes:
+      - ./backend:/app
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      - homeassistant
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    environment:
+      - VITE_HOST=0.0.0.0
+      - VITE_API_PROXY_TARGET=http://backend:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "127.0.0.1:5173:5173"
+    depends_on:
+      - backend

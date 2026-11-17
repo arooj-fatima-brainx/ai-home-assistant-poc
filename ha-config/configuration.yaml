@@ -1,0 +1,8 @@
+# Home Assistant configuration for the POC.
+# The MQTT integration is added through the UI (Settings > Devices & services),
+# pointing to mosquitto:1883 with the "homeassistant" broker credentials.
+
+default_config:
+
+logger:
+  default: info

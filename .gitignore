@@ -1,0 +1,33 @@
+# Secrets
+.env
+mosquitto/config/passwd
+
+# Runtime data
+data/*
+!data/.gitkeep
+models/*
+!models/.gitkeep
+mosquitto/data/
+mosquitto/log/
+
+
+# Home Assistant runtime files (keep configuration.yaml only)
+ha-config/*
+!ha-config/configuration.yaml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+frontend/dist/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+.code-reviews/brainx-review.md

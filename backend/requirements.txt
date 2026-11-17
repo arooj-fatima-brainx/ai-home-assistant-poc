@@ -1,0 +1,14 @@
+# Pinned at project start (2026-11-17). Update deliberately; run pip-audit after changes.
+fastapi==0.163.1
+uvicorn[standard]==0.54.0
+pydantic[email]==2.14.3
+pydantic-settings==2.16.3
+python-multipart==0.0.34
+openai==3.52.0
+PyJWT==2.15.1
+pwdlib[argon2]==0.4.2
+cryptography==50.0.2
+httpx==0.28.1
+websockets==17.4
+faster-whisper==1.2.1
+piper-tts==1.8.0
